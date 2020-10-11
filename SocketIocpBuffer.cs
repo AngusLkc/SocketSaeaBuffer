@@ -81,6 +81,25 @@ namespace SocketIocpBuffer
         }
 
         /// <summary>
+        /// 获取写索引和可写长度,SocketAsyncEventArgs适用
+        /// </summary>
+        public void Put(out int index,out int count)
+        {
+            index = (int)(head & (size - 1));
+            count = (int)Math.Min(surplus, size - index);
+        }
+
+        /// <summary>
+        /// 移动写指针,SocketAsyncEventArgs适用
+        /// </summary>
+        public void PutAck(int dlen)
+        {
+            if (dlen <= 0)
+                throw new Exception("PutAck:无效长度");
+            head += (uint)dlen;
+        }
+
+        /// <summary>
         /// 数据出队
         /// </summary>
         public byte[] GetSize(int dlen)
@@ -92,12 +111,12 @@ namespace SocketIocpBuffer
             Buffer.BlockCopy(buffer, index, data, 0, count);
             if (dlen > count)
                 Buffer.BlockCopy(buffer, 0, data, count, dlen - count);
-            Ack(dlen);
+            GetAck(dlen);
             return data;
         }
 
         /// <summary>
-        /// 获取读索引和可读长度
+        /// 获取读索引和可读长度,SocketAsyncEventArgs适用
         /// </summary>
         public void Get(out int index, out int count)
         {
@@ -108,12 +127,12 @@ namespace SocketIocpBuffer
         }
 
         /// <summary>
-        /// 移动读指针
+        /// 移动读指针,SocketAsyncEventArgs适用
         /// </summary>
-        public void Ack(int dlen)
+        public void GetAck(int dlen)
         {
             if (dlen <= 0)
-                throw new Exception("Ack:无效长度");
+                throw new Exception("GetAck:无效长度");
             tail += (uint)dlen;
         }
     }
