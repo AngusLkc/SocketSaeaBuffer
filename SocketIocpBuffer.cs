@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SocketIocpBuffer
 {
@@ -43,7 +43,7 @@ namespace SocketIocpBuffer
         public SocketIocpBuffer(int bufferSize)
         {
             uint roundup_pow_of_two(int x)
-            {//求一个数的最接近的最大2的指数次幂
+            {
                 int fls(int v)
                 {
                     int p;
@@ -65,7 +65,7 @@ namespace SocketIocpBuffer
         /// <summary>
         /// 数据入队
         /// </summary>
-        public void Put(byte[] data, int dlen)
+        public void PutSize(byte[] data, int dlen)
         {
             if (dlen > surplus)
                 throw new Exception("数据太大,无法写入!");
@@ -81,7 +81,23 @@ namespace SocketIocpBuffer
         }
 
         /// <summary>
-        /// 获取读索引和长度
+        /// 数据出队
+        /// </summary>
+        public byte[] GetSize(int dlen)
+        {
+            if (dlen > occupied)
+                throw new Exception("数据不足,无法取出!");
+            byte[] data = new byte[dlen];
+            Get(out int index, out int count);
+            Buffer.BlockCopy(buffer, index, data, 0, count);
+            if (dlen > count)
+                Buffer.BlockCopy(buffer, 0, data, count, dlen - count);
+            Ack(dlen);
+            return data;
+        }
+
+        /// <summary>
+        /// 获取读索引和可读长度
         /// </summary>
         public void Get(out int index, out int count)
         {
