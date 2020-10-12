@@ -108,9 +108,10 @@ namespace SocketIocpBuffer
                 throw new Exception("数据不足,无法取出!");
             byte[] data = new byte[dlen];
             Get(out int index, out int count);
-            Buffer.BlockCopy(buffer, index, data, 0, count);
-            if (dlen > count)
-                Buffer.BlockCopy(buffer, 0, data, count, dlen - count);
+            int len = Math.Min(dlen, count);
+            Buffer.BlockCopy(buffer, index, data, 0, len);
+            if (dlen > len)
+                Buffer.BlockCopy(buffer, 0, data, len, dlen - len);
             GetAck(dlen);
             return data;
         }
