@@ -71,17 +71,17 @@ namespace SocketIocpBuffer
                 throw new Exception("数据太大,无法写入!");
             //写指针
             int index = (int)(head & (size - 1));
-            //可写长度
+            //一次最大可写长度
             int len = (int)Math.Min(dlen, size - index);
             Buffer.BlockCopy(data, 0, buffer, index, len);
-            //从头写入剩余数据
+            //再次写入剩余数据
             if (dlen > len)
                 Buffer.BlockCopy(data, len, buffer, 0, dlen - len);
             head += (uint)dlen;
         }
 
         /// <summary>
-        /// 获取写索引和可写长度,SocketAsyncEventArgs适用
+        /// 获取写索引和一次最大可写长度,SocketAsyncEventArgs适用
         /// </summary>
         public void Put(out int index,out int count)
         {
@@ -123,7 +123,7 @@ namespace SocketIocpBuffer
         {
             //读指针
             index = (int)(tail & (size - 1));
-            //可读长度
+            //一次最大可读长度
             count = (int)Math.Min(occupied, size - index);
         }
 
